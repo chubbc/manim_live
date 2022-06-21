@@ -17,10 +17,12 @@
 		<div class="reveal">
 			<div class="slides">
 				<script src="js/add_video_slide.js" slide_scene="Title"></script>
-				<script src="js/add_video_slide.js" slide_scene="ExampleSlide"></script>
+				<script src="js/add_video_slide.js" slide_scene="Slide1"></script>
+				<script src="js/add_video_slide.js" slide_scene="Slide2"></script>
+				<script src="js/add_video_slide.js" slide_scene="Slide3"></script>
+				<script src="js/add_video_slide.js" slide_scene="Conclusion"></script>
 			</div>
 		</div>
-
 
 		<script src="dist/reveal.js"></script>
 		<script src="plugin/notes/notes.js"></script>
@@ -33,8 +35,10 @@
 			Reveal.initialize({
 				hash: false,
 				transition: 'none',
-				progress: false,
-
+				backgroundTransition: 'none',	
+				progress: false,	
+				autoPlayMedia: false,	
+				controls: false,
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
 			});
