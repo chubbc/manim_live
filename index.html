@@ -29,6 +29,10 @@
 		<script src="plugin/markdown/markdown.js"></script>
 		<script src="plugin/highlight/highlight.js"></script>
 		<script>
+		
+			const isMobile = /(iphone|ipod|ipad|android)/gi.test( navigator.userAgent ) ||
+				( navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 ); // iPadOS
+				
 			// More info about initialization & config:
 			// - https://revealjs.com/initialization/
 			// - https://revealjs.com/config/
@@ -38,7 +42,8 @@
 				backgroundTransition: 'none',	
 				progress: false,	
 				autoPlayMedia: false,	
-				controls: false,
+				controls: isMobile,
+				controlsLayout: 'edges',
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
 			});
