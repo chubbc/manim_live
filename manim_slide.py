@@ -41,7 +41,8 @@ class SlideScene(Scene):
 
     def tear_down(self):
         super(SlideScene, self).tear_down()
-        self.save_times()
+        if not config.save_last_frame:
+        	self.save_times()
 
     def print_end_message(self):
         super(SlideScene, self).print_end_message()
