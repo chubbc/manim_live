@@ -1,25 +1,59 @@
 from manim_slide import *
 import math
 
-config.background_color = "#161c20"
+################################################################################
+
+# BG = "#161c20"
+BG = "#101518"
+# BG = "#0b0e10"
+
+config.background_color = BG
+
+################################################################################
 
 temp = TexTemplate()
-temp.add_to_preamble(r"\usepackage{stmaryrd,mathtools}")
-temp.add_to_preamble(r"\newcommand{\comm}[2]{\left\llbracket#1,#2\right\rrbracket}")
-temp.add_to_document(r"\fontfamily{lmss}\selectfont")
-# temp.add_to_document(r"\fontfamily{phv}\selectfont")
-# temp = MyTexTemplate()
-temp.add_to_preamble(r"\usepackage{marvosym} \usepackage{fontawesome}")
+temp.add_to_preamble(r"""
+    \usepackage{stmaryrd,mathtools,marvosym,fontawesome}
+    \newcommand{\comm}[2]     {\left\llbracket#1,#2\right\rrbracket}
+    \newcommand{\bra}[1]      {\left\langle #1\right|}
+    \newcommand{\ket}[1]      {\left|#1\right\rangle}
+    \newcommand{\braket}[2]   {\left\langle #1\middle|#2\right\rangle}
+    \newcommand{\ketbra}[2]   {\left|#1\middle\rangle\!\middle\langle#2\right|}
+    \newcommand{\braopket}[3] {\left\langle #1\middle|#2\middle|#3\right\rangle}
+    \newcommand{\proj}[1]     {\left| #1\middle\rangle\!\middle\langle#1\right|}
+    \newcommand{\abs}[1]      {\left| #1 \right|}
+    \newcommand{\norm}[1]     {\left\| #1 \right\|}
+    \newcommand{\Tr}          {\mathrm{Tr}}
+""")
+temp.add_to_document(r"""
+    \fontfamily{lmss}\selectfont
+""")
 
-def MyTex(*x,tex_environment="center",tex_template="",color=WHITE,scale=1.0):
+def MyTex(*x,tex_environment="center",color=WHITE):
     return Tex(*x,
         tex_template=temp,
         tex_environment=tex_environment,
         color=color
-    ).scale(scale)
+    )
+
+def MyMathTex(*x,tex_environment="align*",color=WHITE):
+    return MyTex(*x,
+        tex_environment=tex_environment,
+        color=color
+    )
+
+def OffsetBezier(p1,o1,p2,o2,*x):
+    return CubicBezier(
+        p1,p1+o1,p2+o2,p2,*x)
+
+# self.play(*[FadeOut(mob) for mob in self.mobjects if mob!=toc and mob!=footer])
+
+################################################################################
+
+project_name = "manim\_slides"
+
 
 toc=VGroup(
-    # MyTex(r"\bfseries Lecture 1").scale(1.2),
     MyTex(r"1.~Slide 1"),
     MyTex(r"2.~Slide 2"),
     MyTex(r"3.~Slide 3"),
@@ -27,16 +61,13 @@ toc=VGroup(
 ).arrange(DOWN,buff=0.5,aligned_edge=LEFT).move_to(ORIGIN)
 
 footer=VGroup(
-    MyTex(r"\faGithubSquare~$\texttt{chubbc/manim\_slides}$"),
-    MyTex(r"\faExternalLinkSquare~$\texttt{christopherchubb.com/manim\_slides}$"),
+    MyTex(r"\faGithubSquare~$\texttt{chubbc/%s}$" % project_name),
+    MyTex(r"\faExternalLinkSquare~$\texttt{christopherchubb.com/%s}$" % project_name),
     MyTex(r"\faTwitterSquare~\faYoutubePlay~$\texttt{@QuantumChubb}$"),
 ).arrange(RIGHT,buff=3).to_corner(DOWN).shift(0.5*DOWN).scale(1/2).set_opacity(.5)
 
+################################################################################
 
-
-# footer=MathTex("\\texttt{christopherchubb.com/manim\_slides}").scale(1/2).to_corner(DOWN).set_opacity(.5)
-
-# 0 Done
 class Title(SlideScene):
     def construct(self):
         title = MyTex(r"\bfseries\textsc{Title}").scale(1.25).shift(2.5*UP)
@@ -47,7 +78,7 @@ class Title(SlideScene):
         footer_big=footer.copy().arrange(RIGHT,buff=.375).to_corner(DOWN).shift(0.25*UP).scale(1.25).set_opacity(1)
 
         self.add(name,title,arxiv,ethz,udes,footer_big)
-
+        
         self.play(Unwrite(title),Unwrite(arxiv),Unwrite(name),Unwrite(ethz),Unwrite(udes))
         self.play(ReplacementTransform(footer_big,footer))
         self.wait()
@@ -58,17 +89,27 @@ class Title(SlideScene):
         self.slide_break()
 
         for i in range(1,len(toc)):
-           self.play(toc[i].animate.scale(1.2).set_color(YELLOW),toc[i-1].animate.scale(1/1.2).set_color(WHITE))
-           self.slide_break()
+            self.play(
+                toc[i].animate.scale(1.2).set_color(YELLOW),
+                toc[i-1].animate.scale(1/1.2).set_color(WHITE),
+            )
+            self.slide_break()
 
         self.play(toc[-1].animate.scale(1/1.2).set_color(WHITE))
+
+################################################################################
 
 class Slide1(SlideScene):
     def construct(self):
         tocindex=0
-        heading = toc[tocindex].copy()
-        self.add(toc[0:tocindex],heading,toc[tocindex+1:],footer)
-        self.play(FadeOut(toc[0:tocindex]),FadeOut(toc[tocindex+1:]), heading.animate.move_to(ORIGIN).scale(1.5).to_corner(UP))
+        heading = toc[tocindex]
+        self.add(toc,footer)
+        toc.save_state()
+        self.play(
+            toc.animate.set_opacity(0),
+            heading.animate.scale(2).to_corner(UP).set_x(0),
+        )
+        heading.set_opacity(1)
         self.slide_break()
 
         circle = Circle(radius=1, color=BLUE)
@@ -88,15 +129,21 @@ class Slide1(SlideScene):
         self.play(FadeOut(circle),FadeOut(line),FadeOut(dot))
         self.slide_break()
 
-        self.play(FadeIn(toc[0:tocindex]),FadeIn(toc[tocindex+1:]), ReplacementTransform(heading,toc[tocindex]))
+        self.play(Restore(toc))
 
+################################################################################
 
 class Slide2(SlideScene):
     def construct(self):
         tocindex=1
-        heading = toc[tocindex].copy()
-        self.add(toc[0:tocindex],heading,toc[tocindex+1:],footer)
-        self.play(FadeOut(toc[0:tocindex]),FadeOut(toc[tocindex+1:]), heading.animate.move_to(ORIGIN).scale(1.5).to_corner(UP))
+        heading = toc[tocindex]
+        self.add(toc,footer)
+        toc.save_state()
+        self.play(
+            toc.animate.set_opacity(0),
+            heading.animate.scale(2).to_corner(UP).set_x(0),
+        )
+        heading.set_opacity(1)
         self.slide_break()
 
         square = Square(color=BLUE, fill_opacity=1)
@@ -112,18 +159,24 @@ class Slide2(SlideScene):
         self.play(FadeOut(square))
         self.slide_break()
 
-        self.play(FadeIn(toc[0:tocindex]),FadeIn(toc[tocindex+1:]), ReplacementTransform(heading,toc[tocindex]))
+        self.play(Restore(toc))
 
+################################################################################
 
 class Slide3(SlideScene):
     def construct(self):
         tocindex=2
-        heading = toc[tocindex].copy()
-        self.add(toc[0:tocindex],heading,toc[tocindex+1:],footer)
-        self.play(FadeOut(toc[0:tocindex]),FadeOut(toc[tocindex+1:]), heading.animate.move_to(ORIGIN).scale(1.5).to_corner(UP))
+        heading = toc[tocindex]
+        self.add(toc,footer)
+        toc.save_state()
+        self.play(
+            toc.animate.set_opacity(0),
+            heading.animate.scale(2).to_corner(UP).set_x(0),
+        )
+        heading.set_opacity(1)
         self.slide_break()
 
-        text=MathTex(
+        text=MyMathTex(
             "\\frac{d}{dx}f(x)g(x)=","f(x)\\frac{d}{dx}g(x)","+",
             "g(x)\\frac{d}{dx}f(x)"
         )
@@ -144,26 +197,28 @@ class Slide3(SlideScene):
         self.play(FadeOut(text),FadeOut(framebox2))
         self.slide_break()
 
-        self.play(FadeIn(toc[0:tocindex]),FadeIn(toc[tocindex+1:]), ReplacementTransform(heading,toc[tocindex]))
+        self.play(Restore(toc))
 
 
 class Conclusion(SlideScene):
     def construct(self):
         tocindex=3
-        heading = toc[tocindex].copy()
-        self.add(toc[0:tocindex],heading,toc[tocindex+1:],footer)
-        self.play(FadeOut(toc[0:tocindex]),FadeOut(toc[tocindex+1:]), heading.animate.move_to(ORIGIN).scale(1.5).to_corner(UP))
+        heading = toc[tocindex]
+        self.add(toc,footer)
+        toc.save_state()
+        self.play(
+            toc.animate.set_opacity(0),
+            heading.animate.scale(2).to_corner(UP).set_x(0),
+        )
+        heading.set_opacity(1)
         self.slide_break()
 
-        temp = TexTemplate()
-        temp.add_to_preamble(r"\usepackage{marvosym} \usepackage{fontawesome}")
-
-        summary=Tex("Summary of ","what ","is ","going on").scale(.75).move_to([0,1,0])
+        summary=MyTex("Summary of ","what ","is ","going on").scale(.75).move_to([0,1,0])
         summary[1].set_color(YELLOW)
         summary[3].set_color(RED)
 
-        arxiv=Tex(r"\texttt{\bfseries arXiv:~????.?????}").next_to(summary,DOWN,buff=1).scale(.8)
-        package=Tex(r"\texttt{\bfseries github:~chubbc/manim\_slides}").next_to(arxiv,DOWN,buff=.5).scale(.8)
+        arxiv=MyTex(r"\texttt{\bfseries arXiv:~????.?????}").next_to(summary,DOWN,buff=1).scale(.8)
+        package=MyTex(r"\texttt{\bfseries github:~chubbc/manim\_slides}").next_to(arxiv,DOWN,buff=.5).scale(.8)
 
         self.play(Write(summary))
         self.slide_break()
